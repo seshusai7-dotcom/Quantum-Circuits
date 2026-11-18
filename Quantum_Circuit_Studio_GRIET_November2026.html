@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Quantum Circuit Simulator & Studio | Dr. V. Sesha Sai Kumar, GRIET, Hyderabad (November 2026)</title>
+<style>
+  #griet-qcstudio, #griet-qcstudio * {
+    box-sizing: border-box;
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+
+  #griet-qcstudio {
+    --bg: #eef2f7;
+    --panel: #ffffff;
+    --ink: #0f172a;
+    --ink-soft: #334155;
+    --muted: #64748b;
+    --accent: #1d4ed8;
+    --accent-dark: #1e3a8a;
+    --accent-soft: #eff6ff;
+    --accent-border: #bfdbfe;
+    --teal: #0f766e;
+    --teal-soft: #f0fdfa;
+    --violet: #6d28d9;
+    --violet-soft: #f5f3ff;
+    --amber: #b45309;
+    --amber-soft: #fffbeb;
+    --rose: #be123c;
+    --line: #cbd5e1;
+    --shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+    background: var(--bg);
+    color: var(--ink);
+    font: 14.5px/1.55 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #cbd5e1;
+    margin: 12px auto;
+    max-width: 1320px;
+  }
+
+  #griet-qcstudio .studio-header {
+    background: linear-gradient(135deg, #090d16 0%, #172554 48%, #312e81 82%, #1d4ed8 100%);
+    color: #ffffff;
+    padding: 20px 26px;
+    border-bottom: 3px solid #38bdf8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  #griet-qcstudio .studio-header h1 {
+    margin: 0;
+    font-size: clamp(20px, 2.8vw, 28px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+  }
+
+  #griet-qcstudio .studio-header p {
+    margin: 4px 0 0;
+    color: #cbd5e1;
+    font-size: 13.5px;
+    font-weight: 500;
+  }
+
+  #griet-qcstudio .author-badge {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(186, 230, 253, 0.35);
+    border-radius: 10px;
+    padding: 9px 15px;
+    text-align: right;
+  }
+  #griet-qcstudio .author-name { font-weight: 700; font-size: 15px; color: #ffffff; display: block; }
+  #griet-qcstudio .author-inst { font-size: 12.5px; color: #7dd3fc; font-weight: 600; display: block; }
+  #griet-qcstudio .author-date {
+    display: inline-block; margin-top: 4px; background: rgba(56, 189, 248, 0.25);
+    border: 1px solid rgba(125, 211, 252, 0.45); color: #e0f2fe; font-size: 11px;
+    font-weight: 700; padding: 1px 9px; border-radius: 999px;
+  }
+
+  #griet-qcstudio .workspace {
+    padding: 16px;
+    display: grid;
+    gap: 16px;
+  }
+
+  #griet-qcstudio .panel {
+    background: var(--panel);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+
+  #griet-qcstudio h2 { margin: 0 0 8px; font-size: 18px; font-weight: 800; color: var(--accent-dark); }
+  #griet-qcstudio h3 { margin: 0 0 10px; font-size: 15px; font-weight: 700; color: #4338ca; }
+
+  /* Toolbar & Algorithm Presets */
+  #griet-qcstudio .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 12px;
+  }
+
+  #griet-qcstudio .tool-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #griet-qcstudio select, #griet-qcstudio button { font: inherit; }
+  #griet-qcstudio select {
+    padding: 6px 10px;
+    border: 1.5px solid var(--accent-border);
+    border-radius: 7px;
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  #griet-qcstudio button.btn {
+    padding: 6px 12px;
+    border-radius: 7px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  #griet-qcstudio button.btn:hover { background: #f1f5f9; }
+  #griet-qcstudio button.btn-primary {
+    background: linear-gradient(135deg, var(--violet), var(--accent-dark));
+    color: #ffffff;
+    border: 0;
+  }
+  #griet-qcstudio button.btn-preset {
+    background: var(--violet-soft);
+    color: var(--violet);
+    border: 1px solid #ddd6fe;
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+  #griet-qcstudio button.btn-preset:hover {
+    background: var(--violet);
+    color: #ffffff;
+  }
+
+  /* Gate Palette */
+  #griet-qcstudio .palette {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  #griet-qcstudio .palette-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-right: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  #griet-qcstudio .gate-chip {
+    padding: 5px 11px;
+    border-radius: 7px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.1s;
+    user-select: none;
+  }
+  #griet-qcstudio .gate-chip:hover { transform: translateY(-1px); }
+  #griet-qcstudio .gate-chip.selected {
+    outline: 2.5px solid #0f172a;
+    outline-offset: 1px;
+  }
+
+  .g-pauli { background: #dbeafe; color: #1e3a8a; border-color: #93c5fd; }
+  .g-hadamard { background: #ede9fe; color: #5b21b6; border-color: #c4b5fd; }
+  .g-phase { background: #ccfbf1; color: #115e59; border-color: #5eead4; }
+  .g-rot { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+  .g-multi { background: #fce7f3; color: #9d174d; border-color: #f9a8d4; }
+  .g-erase { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+
+  /* Interactive Circuit Grid Canvas */
+  #griet-qcstudio .circuit-scroll {
+    overflow-x: auto;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #fafcff;
+    padding: 8px;
+  }
+  #griet-qcstudio canvas#circuitCanvas {
+    display: block;
+    cursor: pointer;
+  }
+
+  /* Two-Column Analysis Grid */
+  #griet-qcstudio .analysis-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 16px;
+  }
+  @media (max-width: 960px) {
+    #griet-qcstudio .analysis-grid { grid-template-columns: 1fr; }
+  }
+
+  #griet-qcstudio canvas#probCanvas,
+  #griet-qcstudio canvas#blochCanvas {
+    display: block;
+    width: 100%;
+    height: 290px;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    background: #ffffff;
+  }
+
+  /* Statevector Table */
+  #griet-qcstudio .sv-wrap {
+    max-height: 270px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+  }
+  #griet-qcstudio table.sv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  #griet-qcstudio table.sv-table th {
+    background: #f1f5f9;
+    color: #1e3a8a;
+    text-align: left;
+    padding: 7px 10px;
+    position: sticky;
+    top: 0;
+    border-bottom: 1.5px solid #cbd5e1;
+  }
+  #griet-qcstudio table.sv-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  #griet-qcstudio .prob-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  #griet-qcstudio .prob-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+  }
+
+  /* Tabs for Theory, Cirq/Qiskit Code Export, and Noise/Learning */
+  #griet-qcstudio .tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+  }
+  #griet-qcstudio .tab {
+    border: 1px solid #e2e8f0;
+    padding: 6px 12px;
+    border-radius: 7px;
+    background: #f8fafc;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  #griet-qcstudio .tab.active {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+  }
+  #griet-qcstudio .hidden { display: none; }
+
+  #griet-qcstudio pre.code-box {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 14px;
+    border-radius: 9px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12.5px;
+    overflow-x: auto;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* Unbreakable Equations */
+  #griet-qcstudio .qeq {
+    font-family: 'Cambria Math', 'STIX Two Math', Georgia, serif;
+    font-size: 16.5px;
+    color: #0f172a;
+    display: inline-block;
+    white-space: nowrap;
+    background: #eff6ff;
+    border-left: 3px solid #1d4ed8;
+    padding: 4px 10px;
+    border-radius: 5px;
+    margin: 3px 6px 3px 0;
+  }
+  #griet-qcstudio .qeq var { font-style: italic; color: #1e3a8a; font-weight: 600; }
+  #griet-qcstudio .qeq .ket { color: #6d28d9; font-weight: 700; }
+
+  #griet-qcstudio .studio-footer {
+    background: #e2e8f0;
+    padding: 14px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+  #griet-qcstudio .studio-footer strong { color: var(--accent-dark); }
+  #griet-qcstudio .inst-highlight { color: var(--teal); font-weight: 700; }
+</style>
+</head>
+<body style="margin:0;padding:8px;background:#e2e8f0;">
+
+<div id="griet-qcstudio">
+  <div class="studio-header">
+    <div>
+      <h1>Quantum Circuit Builder &amp; State-Vector Simulator</h1>
+      <p>Interactive Multi-Qubit Circuit Designer &middot; Live 2<sup>n</sup> Statevector &middot; Bloch Spheres &middot; Cirq &amp; Qiskit Export</p>
+    </div>
+    <div class="author-badge">
+      <span class="author-name">Dr. V. Sesha Sai Kumar</span>
+      <span class="author-inst">GRIET, Hyderabad &middot; Department of Physics</span>
+      <span class="author-date">November 2026</span>
+    </div>
+  </div>
+
+  <div class="workspace">
+    <!-- Top Circuit Builder Panel -->
+    <div class="panel">
+      <div class="toolbar">
+        <div class="tool-group">
+          <label style="font-weight:700;font-size:13px;color:#1e3a8a">Qubits (n):</label>
+          <select id="numQubits" aria-label="Number of Qubits">
+            <option value="2">2 Qubits (4 states)</option>
+            <option value="3" selected>3 Qubits (8 states)</option>
+            <option value="4">4 Qubits (16 states)</option>
+            <option value="5">5 Qubits (32 states)</option>
+          </select>
+
+          <label style="font-weight:700;font-size:13px;color:#0f766e;margin-left:6px">Step-by-Step Cursor:</label>
+          <input type="range" id="stepSlider" min="0" max="10" value="10" style="width:120px;accent-color:#6d28d9">
+          <span id="stepReadout" style="font-family:monospace;font-size:12px;font-weight:700;color:#6d28d9">Col 10/10</span>
+        </div>
+
+        <div class="tool-group">
+          <button class="btn btn-primary" id="animateStepBtn">Animate Step-by-Step</button>
+          <button class="btn" id="clearCircuitBtn">Clear Circuit</button>
+          <button class="btn" id="sampleShotsBtn">Sample 1000 Shots</button>
+        </div>
+      </div>
+
+      <!-- Algorithm Showcase Presets -->
+      <div class="palette" style="margin-bottom:10px">
+        <span class="palette-label">Load Algorithm:</span>
+        <button class="btn btn-preset" data-preset="bell">Bell Pair |Φ⁺⟩</button>
+        <button class="btn btn-preset" data-preset="ghz">3-Qubit GHZ State</button>
+        <button class="btn btn-preset" data-preset="teleport">Quantum Teleportation</button>
+        <button class="btn btn-preset" data-preset="grover">Grover Search (|101⟩)</button>
+        <button class="btn btn-preset" data-preset="qft">3-Qubit QFT</button>
+        <button class="btn btn-preset" data-preset="qkd">BB84 QKD Basis Check</button>
+        <button class="btn btn-preset" data-preset="vqe">VQE Hardware Ansatz</button>
+      </div>
+
+      <!-- Gate Palette -->
+      <div class="palette" id="gatePalette">
+        <span class="palette-label">Select Gate &amp; Click Wire:</span>
+        <div class="gate-chip g-hadamard selected" data-gate="H" title="Hadamard Superposition Gate">H</div>
+        <div class="gate-chip g-pauli" data-gate="X" title="Pauli-X (NOT) Bit-Flip Gate">X</div>
+        <div class="gate-chip g-pauli" data-gate="Y" title="Pauli-Y Gate">Y</div>
+        <div class="gate-chip g-pauli" data-gate="Z" title="Pauli-Z Phase-Flip Gate">Z</div>
+        <div class="gate-chip g-phase" data-gate="S" title="S Phase Gate (π/2)">S</div>
+        <div class="gate-chip g-phase" data-gate="T" title="T Gate (π/4)">T</div>
+        <div class="gate-chip g-rot" data-gate="RX" title="Rx(π/2) Rotation">Rx(π/2)</div>
+        <div class="gate-chip g-rot" data-gate="RY" title="Ry(π/2) Rotation">Ry(π/2)</div>
+        <div class="gate-chip g-rot" data-gate="RZ" title="Rz(π/2) Rotation">Rz(π/2)</div>
+        <div class="gate-chip g-multi" data-gate="CNOT" title="Controlled-NOT (Click Control, then Target)">CNOT (•→⊕)</div>
+        <div class="gate-chip g-multi" data-gate="CZ" title="Controlled-Z (Click Control, then Target)">CZ (•→Z)</div>
+        <div class="gate-chip g-multi" data-gate="SWAP" title="SWAP Two Qubits (Click Qubit 1, then Qubit 2)">SWAP (×)</div>
+        <div class="gate-chip g-erase" data-gate="ERASE" title="Click any cell to clear gate">Eraser</div>
+      </div>
+
+      <div id="multiGateHint" style="font-size:12.5px;font-weight:700;color:#be123c;margin-bottom:8px;min-height:18px"></div>
+
+      <!-- Interactive Circuit Grid -->
+      <div class="circuit-scroll">
+        <canvas id="circuitCanvas" width="1180" height="230"></canvas>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:10px">
+        <span id="circuitDesc" style="font-size:13px;font-weight:600;color:#0f766e">Tip: Click any grid slot on a qubit wire to place or remove the selected gate.</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label style="font-size:12.5px;font-weight:700;color:#475569">Depolarizing Noise p:</label>
+          <input type="range" id="noiseSlider" min="0" max="0.25" step="0.01" value="0" style="width:110px;accent-color:#be123c">
+          <span id="noiseVal" style="font-family:monospace;font-size:12px;font-weight:700;color:#be123c">0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle Visualization Row: Probability Chart + Per-Qubit Bloch Spheres -->
+    <div class="analysis-grid">
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h3 style="margin:0">Measurement Probability Distribution P(|qₙ₋₁…q₀⟩)</h3>
+          <span id="modeBadge" style="font-size:11.5px;font-weight:700;color:#1d4ed8;background:#eff6ff;padding:2px 8px;border-radius:999px">Exact Statevector</span>
+        </div>
+        <canvas id="probCanvas" width="640" height="290"></canvas>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-bottom:8px">Single-Qubit Reduced Bloch Vectors</h3>
+        <canvas id="blochCanvas" width="460" height="290"></canvas>
+      </div>
+    </div>
+
+    <!-- Bottom Row: Live Statevector Amplitudes + Code Export & Theory -->
+    <div class="analysis-grid">
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h3 style="margin:0">2ⁿ Complex Statevector &amp; Phase Table</h3>
+          <span id="purityReadout" style="font-family:monospace;font-size:12px;font-weight:700;color:#0f766e">Norm = 1.000</span>
+        </div>
+        <div class="sv-wrap">
+          <table class="sv-table">
+            <thead>
+              <tr>
+                <th>Basis State</th>
+                <th>Amplitude (α + iβ)</th>
+                <th>Phase</th>
+                <th>Prob</th>
+                <th style="width:110px">Visual</th>
+              </tr>
+            </thead>
+            <tbody id="svBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="tabs">
+          <button class="tab active" data-tab="cirq">Google Cirq Code</button>
+          <button class="tab" data-tab="qiskit">IBM Qiskit Code</button>
+          <button class="tab" data-tab="notes">Gate &amp; Algorithm Guide</button>
+        </div>
+
+        <div id="cirqTab">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:12px;font-weight:700;color:#475569">Auto-generated Python Cirq script</span>
+            <button class="btn" id="copyCirqBtn" style="padding:3px 9px;font-size:12px">Copy Cirq</button>
+          </div>
+          <pre class="code-box" id="cirqCode"></pre>
+        </div>
+
+        <div id="qiskitTab" class="hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:12px;font-weight:700;color:#475569">Auto-generated Python Qiskit script</span>
+            <button class="btn" id="copyQiskitBtn" style="padding:3px 9px;font-size:12px">Copy Qiskit</button>
+          </div>
+          <pre class="code-box" id="qiskitCode"></pre>
+        </div>
+
+        <div id="notesTab" class="hidden">
+          <div style="font-size:13.5px;color:#1e293b">
+            <p style="margin-top:0"><strong>State-Vector Simulation Engine:</strong> Stores all <span class="qeq">2<sup><var>n</var></sup></span> complex amplitudes in IEEE-754 double precision and applies exact unitary tensor contractions column-by-column.</p>
+            <p><span class="qeq"><var>H</var><span class="ket">|0&rang;</span> = (<span class="ket">|0&rang;</span>+<span class="ket">|1&rang;</span>)/&radic;2</span> <span class="qeq"><span class="ket">|&Phi;<sup>+</sup>&rang;</span> = (<span class="ket">|00&rang;</span>+<span class="ket">|11&rang;</span>)/&radic;2</span></p>
+            <p style="margin-bottom:0"><strong>Reduced Bloch Vector:</strong> When qubits are entangled, tracing out the rest of the register shrinks a qubit's Bloch vector inside the sphere (<span class="qeq">|<var>r&#8407;</var>| &lt; 1</span>), visually signaling entanglement!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="studio-footer">
+    <div>
+      <strong>Developed by Dr. V. Sesha Sai Kumar</strong> &middot; <span class="inst-highlight">Gokaraju Rangaraju Institute of Engineering and Technology (GRIET), Hyderabad</span> &middot; <strong>November 2026</strong>
+    </div>
+    <div>
+      Interactive Quantum Circuit Simulator &amp; Code Generator &middot; Browser 64-bit Statevector Engine
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const COLS = 10;
+let nQubits = 3;
+let selectedGate = 'H';
+let pendingControl = null; // { col, q } for 2-qubit gates
+let activeStep = COLS;
+let noiseProb = 0;
+let sampledCounts = null;
+let animTimer = null;
+
+// Circuit representation: array of COLS columns; each column is a list of ops:
+// { type: 'H'|'X'|'Y'|'Z'|'S'|'T'|'RX'|'RY'|'RZ', target: q }
+// or { type: 'CNOT'|'CZ'|'SWAP', control: q1, target: q2 }
+let circuit = Array.from({ length: COLS }, () => []);
+
+function setupHiDPI(canvas, cssW, cssH) {
+  const dpr = window.devicePixelRatio || 1;
+  if (canvas.width !== cssW * dpr || canvas.height !== cssH * dpr) {
+    canvas.width = cssW * dpr;
+    canvas.height = cssH * dpr;
+  }
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+// =========================================================================
+// COMPLEX STATEVECTOR SIMULATION ENGINE (2^n amplitudes)
+// =========================================================================
+function initState(n) {
+  const dim = 1 << n;
+  const re = new Float64Array(dim);
+  const im = new Float64Array(dim);
+  re[0] = 1.0;
+  return { re, im, dim };
+}
+
+function applySingleGate(state, n, target, mat) {
+  // mat = [[r00,i00], [r01,i01], [r10,i10], [r11,i11]]
+  // Qubit index 0 is MSB (top wire q0) for intuitive circuit reading
+  const bitPos = n - 1 - target;
+  const step = 1 << bitPos;
+  const { re, im, dim } = state;
+
+  for (let i = 0; i < dim; i += (step << 1)) {
+    for (let j = 0; j < step; j++) {
+      const i0 = i + j;
+      const i1 = i0 + step;
+      const a0r = re[i0], a0i = im[i0];
+      const a1r = re[i1], a1i = im[i1];
+
+      re[i0] = (mat[0][0]*a0r - mat[0][1]*a0i) + (mat[1][0]*a1r - mat[1][1]*a1i);
+      im[i0] = (mat[0][0]*a0i + mat[0][1]*a0r) + (mat[1][0]*a1i + mat[1][1]*a1r);
+
+      re[i1] = (mat[2][0]*a0r - mat[2][1]*a0i) + (mat[3][0]*a1r - mat[3][1]*a1i);
+      im[i1] = (mat[2][0]*a0i + mat[2][1]*a0r) + (mat[3][0]*a1i + mat[3][1]*a1r);
+    }
+  }
+}
+
+function applyControlledGate(state, n, ctrl, targ, type) {
+  const cBit = n - 1 - ctrl;
+  const tBit = n - 1 - targ;
+  const { re, im, dim } = state;
+
+  if (type === 'CNOT') {
+    for (let idx = 0; idx < dim; idx++) {
+      if (((idx >> cBit) & 1) === 1 && ((idx >> tBit) & 1) === 0) {
+        const partner = idx | (1 << tBit);
+        const tr = re[idx], ti = im[idx];
+        re[idx] = re[partner]; im[idx] = im[partner];
+        re[partner] = tr; im[partner] = ti;
+      }
+    }
+  } else if (type === 'CZ') {
+    for (let idx = 0; idx < dim; idx++) {
+      if (((idx >> cBit) & 1) === 1 && ((idx >> tBit) & 1) === 1) {
+        re[idx] = -re[idx];
+        im[idx] = -im[idx];
+      }
+    }
+  } else if (type === 'SWAP') {
+    for (let idx = 0; idx < dim; idx++) {
+      const b1 = (idx >> cBit) & 1;
+      const b2 = (idx >> tBit) & 1;
+      if (b1 === 1 && b2 === 0) {
+        const partner = (idx & ~(1 << cBit)) | (1 << tBit);
+        const tr = re[idx], ti = im[idx];
+        re[idx] = re[partner]; im[idx] = im[partner];
+        re[partner] = tr; im[partner] = ti;
+      }
+    }
+  }
+}
+
+const S2 = Math.SQRT1_2;
+const GATE_MATS = {
+  H:  [[S2, 0], [S2, 0], [S2, 0], [-S2, 0]],
+  X:  [[0, 0], [1, 0], [1, 0], [0, 0]],
+  Y:  [[0, 0], [0, -1], [0, 1], [0, 0]],
+  Z:  [[1, 0], [0, 0], [0, 0], [-1, 0]],
+  S:  [[1, 0], [0, 0], [0, 0], [0, 1]],
+  T:  [[1, 0], [0, 0], [0, 0], [S2, S2]],
+  RX: [[S2, 0], [0, -S2], [0, -S2], [S2, 0]],
+  RY: [[S2, 0], [-S2, 0], [S2, 0], [S2, 0]],
+  RZ: [[S2, -S2], [0, 0], [0, 0], [S2, S2]]
+};
+
+function simulateUpTo(maxCol) {
+  const st = initState(nQubits);
+  const limit = Math.min(COLS, maxCol);
+  for (let c = 0; c < limit; c++) {
+    for (const op of circuit[c]) {
+      if (GATE_MATS[op.type]) {
+        applySingleGate(st, nQubits, op.target, GATE_MATS[op.type]);
+      } else {
+        applyControlledGate(st, nQubits, op.control, op.target, op.type);
+      }
+    }
+  }
+  return st;
+}
+
+function computeBlochVectors(st, n) {
+  const { re, im, dim } = st;
+  const vecs = [];
+  for (let q = 0; q < n; q++) {
+    const bitPos = n - 1 - q;
+    let rx = 0, ry = 0, rz = 0;
+    for (let idx = 0; idx < dim; idx++) {
+      const b = (idx >> bitPos) & 1;
+      const p = re[idx] * re[idx] + im[idx] * im[idx];
+      rz += (b === 0 ? 1 : -1) * p;
+      if (b === 0) {
+        const partner = idx | (1 << bitPos);
+        // 2 * Re(c0* c1) and 2 * Im(c0* c1)
+        const prodRe = re[idx] * re[partner] + im[idx] * im[partner];
+        const prodIm = re[idx] * im[partner] - im[idx] * re[partner];
+        rx += 2 * prodRe;
+        ry += 2 * prodIm;
+      }
+    }
+    // Apply depolarizing shrinkage factor if noise > 0
+    const shrink = Math.pow(1 - noiseProb, activeStep * 0.4);
+    vecs.push({ x: rx * shrink, y: ry * shrink, z: rz * shrink });
+  }
+  return vecs;
+}
+
+// =========================================================================
+// CIRCUIT CANVAS RENDERING & INTERACTION
+// =========================================================================
+const ROW_H = 48, TOP_PAD = 34, LEFT_PAD = 78, COL_W = 98;
+
+function drawCircuit() {
+  const canvas = $('circuitCanvas');
+  const cssW = LEFT_PAD + COLS * COL_W + 40;
+  const cssH = TOP_PAD + nQubits * ROW_H + 24;
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  const ctx = setupHiDPI(canvas, cssW, cssH);
+  ctx.clearRect(0, 0, cssW, cssH);
+
+  // Highlight executed columns up to activeStep
+  if (activeStep > 0) {
+    ctx.fillStyle = 'rgba(239, 246, 255, 0.75)';
+    ctx.fillRect(LEFT_PAD, 12, activeStep * COL_W, cssH - 24);
+  }
+
+  // Column step headers
+  ctx.font = 'bold 11px monospace';
+  ctx.textAlign = 'center';
+  for (let c = 0; c < COLS; c++) {
+    const cx = LEFT_PAD + (c + 0.5) * COL_W;
+    ctx.fillStyle = c < activeStep ? '#1d4ed8' : '#94a3b8';
+    ctx.fillText(`Step ${c + 1}`, cx, 20);
+
+    // Subtle slot guide boxes
+    for (let q = 0; q < nQubits; q++) {
+      const cy = TOP_PAD + (q + 0.5) * ROW_H;
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(cx - 22, cy - 17, 44, 34);
+    }
+  }
+
+  // Qubit wires
+  for (let q = 0; q < nQubits; q++) {
+    const wy = TOP_PAD + (q + 0.5) * ROW_H;
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(LEFT_PAD - 10, wy);
+    ctx.lineTo(LEFT_PAD + COLS * COL_W + 10, wy);
+    ctx.stroke();
+
+    ctx.fillStyle = '#1e3a8a';
+    ctx.font = 'bold 13.5px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(`q${q} |0⟩`, LEFT_PAD - 18, wy + 5);
+  }
+
+  // Pending 2-qubit control highlight
+  if (pendingControl) {
+    const cx = LEFT_PAD + (pendingControl.col + 0.5) * COL_W;
+    const cy = TOP_PAD + (pendingControl.q + 0.5) * ROW_H;
+    ctx.fillStyle = '#be123c';
+    ctx.beginPath(); ctx.arc(cx, cy, 9, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // Render placed gates
+  for (let c = 0; c < COLS; c++) {
+    const cx = LEFT_PAD + (c + 0.5) * COL_W;
+    for (const op of circuit[c]) {
+      if (op.type === 'CNOT' || op.type === 'CZ' || op.type === 'SWAP') {
+        const y1 = TOP_PAD + (op.control + 0.5) * ROW_H;
+        const y2 = TOP_PAD + (op.target + 0.5) * ROW_H;
+        ctx.strokeStyle = '#9d174d';
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(cx, y1); ctx.lineTo(cx, y2); ctx.stroke();
+
+        if (op.type === 'SWAP') {
+          [y1, y2].forEach(yy => {
+            ctx.beginPath(); ctx.moveTo(cx - 8, yy - 8); ctx.lineTo(cx + 8, yy + 8); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx + 8, yy - 8); ctx.lineTo(cx - 8, yy + 8); ctx.stroke();
+          });
+        } else {
+          // Control dot
+          ctx.fillStyle = '#9d174d';
+          ctx.beginPath(); ctx.arc(cx, y1, 7, 0, Math.PI * 2); ctx.fill();
+          if (op.type === 'CNOT') {
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath(); ctx.arc(cx, y2, 13, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx - 8, y2); ctx.lineTo(cx + 8, y2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx, y2 - 8); ctx.lineTo(cx, y2 + 8); ctx.stroke();
+          } else {
+            ctx.fillStyle = '#fce7f3';
+            ctx.beginPath(); ctx.roundRect(cx - 16, y2 - 15, 32, 30, 6); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#9d174d'; ctx.font = 'bold 14px monospace'; ctx.textAlign = 'center';
+            ctx.fillText('Z', cx, y2 + 5);
+          }
+        }
+      } else {
+        const cy = TOP_PAD + (op.target + 0.5) * ROW_H;
+        const isRot = ['RX', 'RY', 'RZ'].includes(op.type);
+        const bw = isRot ? 56 : 38;
+        ctx.fillStyle = op.type === 'H' ? '#ede9fe' : isRot ? '#fef3c7' : ['S', 'T'].includes(op.type) ? '#ccfbf1' : '#dbeafe';
+        ctx.strokeStyle = op.type === 'H' ? '#6d28d9' : isRot ? '#b45309' : ['S', 'T'].includes(op.type) ? '#0f766e' : '#1d4ed8';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath(); ctx.roundRect(cx - bw / 2, cy - 16, bw, 32, 7); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.font = isRot ? 'bold 11.5px monospace' : 'bold 15px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(isRot ? op.type.replace('R', 'R') + '(π/2)' : op.type, cx, cy + 5);
+      }
+    }
+  }
+}
+
+$('circuitCanvas').addEventListener('click', e => {
+  const rect = $('circuitCanvas').getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const col = Math.floor((mx - LEFT_PAD) / COL_W);
+  const q = Math.floor((my - TOP_PAD) / ROW_H);
+  if (col < 0 || col >= COLS || q < 0 || q >= nQubits) return;
+
+  sampledCounts = null;
+  const isTwoQubit = ['CNOT', 'CZ', 'SWAP'].includes(selectedGate);
+
+  // Helper to remove any existing op touching qubit q in column col
+  const clearSlot = (c, qubit) => {
+    circuit[c] = circuit[c].filter(op => op.target !== qubit && op.control !== qubit);
+  };
+
+  if (selectedGate === 'ERASE') {
+    pendingControl = null;
+    $('multiGateHint').textContent = '';
+    clearSlot(col, q);
+    updateAll();
+    return;
+  }
+
+  if (isTwoQubit) {
+    if (!pendingControl || pendingControl.col !== col) {
+      clearSlot(col, q);
+      pendingControl = { col, q };
+      $('multiGateHint').textContent = `Step ${col + 1}: Control placed on q${q}. Now click a target qubit in Step ${col + 1}!`;
+      drawCircuit();
+      return;
+    } else {
+      if (pendingControl.q === q) {
+        pendingControl = null;
+        $('multiGateHint').textContent = '';
+        drawCircuit();
+        return;
+      }
+      clearSlot(col, pendingControl.q);
+      clearSlot(col, q);
+      circuit[col].push({ type: selectedGate, control: pendingControl.q, target: q });
+      pendingControl = null;
+      $('multiGateHint').textContent = '';
+      updateAll();
+      return;
+    }
+  }
+
+  // Single-qubit gate toggle/replace
+  pendingControl = null;
+  $('multiGateHint').textContent = '';
+  const existingIdx = circuit[col].findIndex(op => op.target === q && op.control === undefined);
+  if (existingIdx >= 0 && circuit[col][existingIdx].type === selectedGate) {
+    circuit[col].splice(existingIdx, 1);
+  } else {
+    clearSlot(col, q);
+    circuit[col].push({ type: selectedGate, target: q });
+  }
+  updateAll();
+});
+
+// =========================================================================
+// PROBABILITY HISTOGRAM & MULTI-QUBIT BLOCH SPHERES
+// =========================================================================
+function drawProbabilities(st) {
+  const canvas = $('probCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const w = Math.max(320, Math.round(rect.width || 620));
+  const h = 290;
+  const ctx = setupHiDPI(canvas, w, h);
+  ctx.clearRect(0, 0, w, h);
+
+  const { re, im, dim } = st;
+  const L = 52, R = 18, T = 20, B = 48;
+  const plotW = w - L - R, plotH = h - T - B;
+
+  // Apply depolarizing noise mixing toward uniform 1/dim
+  const probs = Array.from({ length: dim }, (_, i) => {
+    const idealP = re[i] * re[i] + im[i] * im[i];
+    const noisyP = (1 - noiseProb) * idealP + noiseProb * (1 / dim);
+    return sampledCounts ? (sampledCounts[i] / 1000) : noisyP;
+  });
+
+  $('modeBadge').textContent = sampledCounts
+    ? '1000-Shot Monte Carlo'
+    : noiseProb > 0 ? `Noisy (p=${noiseProb.toFixed(2)})` : 'Exact Statevector';
+
+  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1; ctx.fillStyle = '#475569';
+  ctx.font = '11px system-ui, sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (let i = 0; i <= 4; i++) {
+    const yy = T + (i * plotH) / 4;
+    ctx.beginPath(); ctx.moveTo(L, yy); ctx.lineTo(w - R, yy); ctx.stroke();
+    ctx.fillText(((1 - i / 4) * 100).toFixed(0) + '%', L - 6, yy);
+  }
+
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5; ctx.strokeRect(L, T, plotW, plotH);
+
+  const slotW = plotW / dim;
+  const barW = Math.max(3, Math.min(44, slotW * 0.68));
+  probs.forEach((p, idx) => {
+    const cx = L + (idx + 0.5) * slotW;
+    const bh = p * plotH;
+    const by = h - B - bh;
+    ctx.fillStyle = p > 0.2 ? '#6d28d9' : '#2563eb';
+    ctx.beginPath(); ctx.roundRect(cx - barW / 2, by, barW, bh, [4, 4, 0, 0]); ctx.fill();
+
+    if (dim <= 8 && p > 0.01) {
+      ctx.fillStyle = '#1e3a8a'; ctx.font = 'bold 10.5px monospace'; ctx.textAlign = 'center';
+      ctx.fillText((p * 100).toFixed(1) + '%', cx, by - 7);
+    }
+    if (dim <= 16 || idx % 2 === 0) {
+      ctx.fillStyle = '#334155';
+      ctx.font = dim > 16 ? '9.5px monospace' : 'bold 10.5px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('|' + idx.toString(2).padStart(nQubits, '0') + '⟩', cx, h - B + 14);
+    }
+  });
+}
+
+function drawBlochGrid(vecs) {
+  const canvas = $('blochCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const w = Math.max(300, Math.round(rect.width || 440));
+  const h = 290;
+  const ctx = setupHiDPI(canvas, w, h);
+  ctx.clearRect(0, 0, w, h);
+
+  const cols = nQubits <= 3 ? nQubits : 3;
+  const rows = Math.ceil(nQubits / cols);
+  const cellW = w / cols, cellH = h / rows;
+  const R = Math.min(cellW * 0.34, cellH * 0.34, 56);
+
+  vecs.forEach((v, q) => {
+    const c = q % cols, r = Math.floor(q / cols);
+    const cx = (c + 0.5) * cellW;
+    const cy = (r + 0.5) * cellH + 4;
+
+    ctx.fillStyle = '#f8fafc';
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#93c5fd'; ctx.lineWidth = 1.6; ctx.stroke();
+
+    ctx.save(); ctx.setLineDash([3, 3]); ctx.strokeStyle = '#94a3b8';
+    ctx.beginPath(); ctx.ellipse(cx, cy, R, R * 0.3, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+
+    const px = cx + R * (v.y * 0.9 - v.x * 0.4);
+    const py = cy + R * (-v.z * 0.94 + v.x * 0.22);
+    ctx.strokeStyle = '#6d28d9'; ctx.lineWidth = 2.8;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(px, py); ctx.stroke();
+    ctx.fillStyle = '#6d28d9'; ctx.beginPath(); ctx.arc(px, py, 4.5, 0, Math.PI * 2); ctx.fill();
+
+    const rLen = Math.hypot(v.x, v.y, v.z);
+    ctx.fillStyle = '#1e3a8a'; ctx.font = 'bold 11.5px monospace'; ctx.textAlign = 'center';
+    ctx.fillText(`q${q} (|r|=${rLen.toFixed(2)})`, cx, cy - R - 8);
+  });
+}
+
+function updateStateTable(st) {
+  const { re, im, dim } = st;
+  let normSq = 0;
+  let rowsHtml = '';
+  for (let i = 0; i < dim; i++) {
+    const r = Math.abs(re[i]) < 1e-4 ? 0 : re[i];
+    const m = Math.abs(im[i]) < 1e-4 ? 0 : im[i];
+    const idealP = r * r + m * m;
+    const p = (1 - noiseProb) * idealP + noiseProb * (1 / dim);
+    normSq += idealP;
+    const phaseDeg = idealP < 1e-5 ? '—' : (Math.atan2(m, r) * 180 / Math.PI).toFixed(0) + '°';
+    const ampStr = `${r.toFixed(3)} ${m >= 0 ? '+' : '−'} ${Math.abs(m).toFixed(3)}i`;
+    const basis = '|' + i.toString(2).padStart(nQubits, '0') + '⟩';
+
+    rowsHtml += `
+      <tr>
+        <td style="font-weight:700;color:#1e3a8a">${basis}</td>
+        <td>${ampStr}</td>
+        <td style="color:#0f766e">${phaseDeg}</td>
+        <td style="font-weight:700;color:#6d28d9">${(p * 100).toFixed(1)}%</td>
+        <td><div class="prob-bar-bg"><div class="prob-bar-fill" style="width:${(p * 100).toFixed(1)}%"></div></div></td>
+      </tr>
+    `;
+  }
+  $('svBody').innerHTML = rowsHtml;
+  $('purityReadout').textContent = `Norm = ${Math.sqrt(normSq).toFixed(3)} | States = ${dim}`;
+}
+
+// =========================================================================
+// LIVE GOOGLE CIRQ & IBM QISKIT CODE GENERATOR
+// =========================================================================
+function updateCodeExports() {
+  let cirq = `import cirq\n\n# Generated by GRIET Quantum Circuit Studio (Dr. V. Sesha Sai Kumar, Nov 2026)\nqubits = cirq.LineQubit.range(${nQubits})\ncircuit = cirq.Circuit()\n\n`;
+  let qiskit = `from qiskit import QuantumCircuit\nfrom qiskit_aer import AerSimulator\n\n# Generated by GRIET Quantum Circuit Studio (Dr. V. Sesha Sai Kumar, Nov 2026)\nqc = QuantumCircuit(${nQubits}, ${nQubits})\n\n`;
+
+  for (let c = 0; c < COLS; c++) {
+    if (!circuit[c].length) continue;
+    for (const op of circuit[c]) {
+      if (op.type === 'H') { cirq += `circuit.append(cirq.H(qubits[${op.target}]))\n`; qiskit += `qc.h(${op.target})\n`; }
+      else if (op.type === 'X') { cirq += `circuit.append(cirq.X(qubits[${op.target}]))\n`; qiskit += `qc.x(${op.target})\n`; }
+      else if (op.type === 'Y') { cirq += `circuit.append(cirq.Y(qubits[${op.target}]))\n`; qiskit += `qc.y(${op.target})\n`; }
+      else if (op.type === 'Z') { cirq += `circuit.append(cirq.Z(qubits[${op.target}]))\n`; qiskit += `qc.z(${op.target})\n`; }
+      else if (op.type === 'S') { cirq += `circuit.append(cirq.S(qubits[${op.target}]))\n`; qiskit += `qc.s(${op.target})\n`; }
+      else if (op.type === 'T') { cirq += `circuit.append(cirq.T(qubits[${op.target}]))\n`; qiskit += `qc.t(${op.target})\n`; }
+      else if (op.type === 'RX') { cirq += `circuit.append(cirq.rx(1.5708)(qubits[${op.target}]))\n`; qiskit += `qc.rx(1.5708, ${op.target})\n`; }
+      else if (op.type === 'RY') { cirq += `circuit.append(cirq.ry(1.5708)(qubits[${op.target}]))\n`; qiskit += `qc.ry(1.5708, ${op.target})\n`; }
+      else if (op.type === 'RZ') { cirq += `circuit.append(cirq.rz(1.5708)(qubits[${op.target}]))\n`; qiskit += `qc.rz(1.5708, ${op.target})\n`; }
+      else if (op.type === 'CNOT') { cirq += `circuit.append(cirq.CNOT(qubits[${op.control}], qubits[${op.target}]))\n`; qiskit += `qc.cx(${op.control}, ${op.target})\n`; }
+      else if (op.type === 'CZ') { cirq += `circuit.append(cirq.CZ(qubits[${op.control}], qubits[${op.target}]))\n`; qiskit += `qc.cz(${op.control}, ${op.target})\n`; }
+      else if (op.type === 'SWAP') { cirq += `circuit.append(cirq.SWAP(qubits[${op.control}], qubits[${op.target}]))\n`; qiskit += `qc.swap(${op.control}, ${op.target})\n`; }
+    }
+  }
+  cirq += `\ncircuit.append(cirq.measure(*qubits, key='result'))\nsim = cirq.Simulator()\nres = sim.run(circuit, repetitions=1000)\nprint(res.histogram(key='result'))`;
+  qiskit += `\nqc.measure(range(${nQubits}), range(${nQubits}))\nresult = AerSimulator().run(qc, shots=1000).result()\nprint(result.get_counts())`;
+
+  $('cirqCode').textContent = cirq;
+  $('qiskitCode').textContent = qiskit;
+}
+
+// =========================================================================
+// ALGORITHM PRESETS
+// =========================================================================
+function loadPreset(name) {
+  sampledCounts = null;
+  pendingControl = null;
+  $('multiGateHint').textContent = '';
+  circuit = Array.from({ length: COLS }, () => []);
+
+  if (name === 'bell') {
+    nQubits = 2;
+    circuit[0] = [{ type: 'H', target: 0 }];
+    circuit[1] = [{ type: 'CNOT', control: 0, target: 1 }];
+    $('circuitDesc').textContent = 'Loaded: 2-Qubit Bell State |Φ⁺⟩ = (|00⟩ + |11⟩)/√2. Notice Bloch vectors shrink to |r|=0 (maximal entanglement)!';
+  } else if (name === 'ghz') {
+    nQubits = 3;
+    circuit[0] = [{ type: 'H', target: 0 }];
+    circuit[1] = [{ type: 'CNOT', control: 0, target: 1 }];
+    circuit[2] = [{ type: 'CNOT', control: 1, target: 2 }];
+    $('circuitDesc').textContent = 'Loaded: 3-Qubit Greenberger–Horne–Zeilinger (GHZ) state (|000⟩ + |111⟩)/√2.';
+  } else if (name === 'teleport') {
+    nQubits = 3;
+    // Prepare payload state Ry(pi/2) on q0, entangle q1-q2, Bell measurement on q0-q1
+    circuit[0] = [{ type: 'RY', target: 0 }, { type: 'H', target: 1 }];
+    circuit[1] = [{ type: 'CNOT', control: 1, target: 2 }];
+    circuit[2] = [{ type: 'CNOT', control: 0, target: 1 }];
+    circuit[3] = [{ type: 'H', target: 0 }];
+    $('circuitDesc').textContent = 'Loaded: Quantum Teleportation circuit transferring q0 state across entangled pair (q1, q2).';
+  } else if (name === 'grover') {
+    nQubits = 3;
+    // Superposition -> Oracle for |101> (X on q1, CCZ simulated via H-CNOT-T pattern, simplified phase flip) -> Diffusion
+    circuit[0] = [{ type: 'H', target: 0 }, { type: 'H', target: 1 }, { type: 'H', target: 2 }];
+    circuit[1] = [{ type: 'X', target: 1 }];
+    circuit[2] = [{ type: 'CZ', control: 0, target: 2 }];
+    circuit[3] = [{ type: 'X', target: 1 }];
+    circuit[4] = [{ type: 'H', target: 0 }, { type: 'H', target: 1 }, { type: 'H', target: 2 }];
+    circuit[5] = [{ type: 'X', target: 0 }, { type: 'X', target: 1 }, { type: 'X', target: 2 }];
+    circuit[6] = [{ type: 'CZ', control: 0, target: 2 }];
+    circuit[7] = [{ type: 'X', target: 0 }, { type: 'X', target: 1 }, { type: 'X', target: 2 }];
+    circuit[8] = [{ type: 'H', target: 0 }, { type: 'H', target: 1 }, { type: 'H', target: 2 }];
+    $('circuitDesc').textContent = 'Loaded: Grover Amplitude Amplification circuit showing oracle phase inversion and diffusion interference.';
+  } else if (name === 'qft') {
+    nQubits = 3;
+    circuit[0] = [{ type: 'X', target: 2 }, { type: 'H', target: 0 }];
+    circuit[1] = [{ type: 'CZ', control: 1, target: 0 }];
+    circuit[2] = [{ type: 'H', target: 1 }];
+    circuit[3] = [{ type: 'CZ', control: 2, target: 1 }];
+    circuit[4] = [{ type: 'H', target: 2 }];
+    circuit[5] = [{ type: 'SWAP', control: 0, target: 2 }];
+    $('circuitDesc').textContent = 'Loaded: 3-Qubit Quantum Fourier Transform (QFT) mapping computational state |001⟩ into uniform frequency amplitudes with relative phases.';
+  } else if (name === 'qkd') {
+    nQubits = 2;
+    circuit[0] = [{ type: 'X', target: 0 }, { type: 'H', target: 0 }];
+    circuit[1] = [{ type: 'H', target: 0 }];
+    $('circuitDesc').textContent = 'Loaded: BB84 QKD conjugate basis check—matching Hadamard bases recover Alice’s bit |1⟩ deterministically.';
+  } else if (name === 'vqe') {
+    nQubits = 3;
+    circuit[0] = [{ type: 'RY', target: 0 }, { type: 'RY', target: 1 }, { type: 'RY', target: 2 }];
+    circuit[1] = [{ type: 'CNOT', control: 0, target: 1 }];
+    circuit[2] = [{ type: 'CNOT', control: 1, target: 2 }];
+    circuit[3] = [{ type: 'RZ', target: 0 }, { type: 'RZ', target: 1 }, { type: 'RZ', target: 2 }];
+    $('circuitDesc').textContent = 'Loaded: Hardware-Efficient VQE Ansatz (Ry–CNOT–Rz entangling layers).';
+  }
+
+  $('numQubits').value = String(nQubits);
+  activeStep = COLS;
+  $('stepSlider').value = COLS;
+  updateAll();
+}
+
+function updateAll() {
+  $('stepReadout').textContent = `Step ${activeStep}/${COLS}`;
+  drawCircuit();
+  const st = simulateUpTo(activeStep);
+  drawProbabilities(st);
+  const blochVecs = computeBlochVectors(st, nQubits);
+  drawBlochGrid(blochVecs);
+  updateStateTable(st);
+  updateCodeExports();
+}
+
+// Event Listeners
+document.querySelectorAll('#griet-qcstudio .gate-chip').forEach(chip => {
+  chip.onclick = () => {
+    document.querySelectorAll('#griet-qcstudio .gate-chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    selectedGate = chip.dataset.gate;
+    pendingControl = null;
+    $('multiGateHint').textContent = ['CNOT', 'CZ', 'SWAP'].includes(selectedGate)
+      ? `Selected ${selectedGate}: Click a control qubit wire first, then click a target qubit wire in the same column.`
+      : '';
+    drawCircuit();
+  };
+});
+
+document.querySelectorAll('#griet-qcstudio .btn-preset').forEach(btn => {
+  btn.onclick = () => loadPreset(btn.dataset.preset);
+});
+
+$('numQubits').onchange = e => {
+  nQubits = Number(e.target.value);
+  sampledCounts = null;
+  pendingControl = null;
+  circuit = Array.from({ length: COLS }, () => []);
+  updateAll();
+};
+
+$('stepSlider').oninput = e => {
+  activeStep = Number(e.target.value);
+  sampledCounts = null;
+  updateAll();
+};
+
+$('noiseSlider').oninput = e => {
+  noiseProb = Number(e.target.value);
+  $('noiseVal').textContent = noiseProb.toFixed(2);
+  sampledCounts = null;
+  updateAll();
+};
+
+$('clearCircuitBtn').onclick = () => {
+  sampledCounts = null;
+  pendingControl = null;
+  circuit = Array.from({ length: COLS }, () => []);
+  activeStep = COLS;
+  $('stepSlider').value = COLS;
+  updateAll();
+};
+
+$('animateStepBtn').onclick = () => {
+  if (animTimer) { clearInterval(animTimer); animTimer = null; $('animateStepBtn').textContent = 'Animate Step-by-Step'; return; }
+  sampledCounts = null;
+  activeStep = 0;
+  $('stepSlider').value = 0;
+  updateAll();
+  $('animateStepBtn').textContent = 'Stop Step Animation';
+  animTimer = setInterval(() => {
+    activeStep++;
+    if (activeStep > COLS) {
+      clearInterval(animTimer);
+      animTimer = null;
+      activeStep = COLS;
+      $('animateStepBtn').textContent = 'Animate Step-by-Step';
+      return;
+    }
+    $('stepSlider').value = activeStep;
+    updateAll();
+  }, 550);
+};
+
+$('sampleShotsBtn').onclick = () => {
+  const st = simulateUpTo(activeStep);
+  const { re, im, dim } = st;
+  const probs = Array.from({ length: dim }, (_, i) => (1 - noiseProb) * (re[i]*re[i] + im[i]*im[i]) + noiseProb / dim);
+  const counts = new Array(dim).fill(0);
+  for (let s = 0; s < 1000; s++) {
+    const r = Math.random();
+    let acc = 0;
+    for (let i = 0; i < dim; i++) {
+      acc += probs[i];
+      if (r <= acc || i === dim - 1) { counts[i]++; break; }
+    }
+  }
+  sampledCounts = counts;
+  drawProbabilities(st);
+};
+
+document.querySelectorAll('#griet-qcstudio .tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('#griet-qcstudio .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    ['cirq', 'qiskit', 'notes'].forEach(k => $(k + 'Tab').classList.toggle('hidden', k !== tab.dataset.tab));
+  };
+});
+
+$('copyCirqBtn').onclick = () => { navigator.clipboard.writeText($('cirqCode').textContent); $('copyCirqBtn').textContent = 'Copied!'; setTimeout(() => $('copyCirqBtn').textContent = 'Copy Cirq', 1200); };
+$('copyQiskitBtn').onclick = () => { navigator.clipboard.writeText($('qiskitCode').textContent); $('copyQiskitBtn').textContent = 'Copied!'; setTimeout(() => $('copyQiskitBtn').textContent = 'Copy Qiskit', 1200); };
+
+window.addEventListener('resize', updateAll);
+
+// Initialize with Bell Pair preset
+loadPreset('bell');
+</script>
+</body>
+</html>
